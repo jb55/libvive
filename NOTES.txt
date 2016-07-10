@@ -1,0 +1,13 @@
+
+HID
+===
+
+Description       VendorID   ProductID
+
+Lighthouse        28de       2000
+Vive Controller   28de       2101
+Vive              0bb4       2c87
+Vive Audio        0d8c       0012
+
+
+
