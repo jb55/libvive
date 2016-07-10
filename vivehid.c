@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
-	handle = hid_open(0x28de, 0x2000, L"LHR-1B4AB126");
+	handle = hid_open(0x28de, 0x2101, L"CFAFE97AC4");
 
   if (!handle) {
     printf("Couldn't get hid handle %04hx %04hx\n",
@@ -76,8 +76,9 @@ int main(int argc, char* argv[])
 	// Set the hid_read() function to be non-blocking.
 
 	// Read a Feature Report from the device
+  buf[0] = report;
   printf("Feature Report %hhu\n", report);
-  res = hid_get_feature_report(handle, &report, 64);
+  res = hid_get_feature_report(handle, buf, 64);
   printf("Len: %d\n", res);
 
   // Print out the returned buffer.
