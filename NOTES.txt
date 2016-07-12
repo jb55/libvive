@@ -10,4 +10,46 @@ Vive              0bb4       2c87
 Vive Audio        0d8c       0012
 
 
+Data
+====
 
+Type -> offset 4 
+
+
+Packet Types
+------------
+
+Description       Type2
+
+Gyro/Accel        232
+Analog            241
+Trackpad          242
+Trackpad Tap      243      # more reliable than Analog for some reason?
+Trigger           244
+Trigger Btn       245
+
+Trigger + Other?  249
+
+
+Lasers Top (Counter-Clockwise)
+80,81,82
+
+Lasers Bottom
+88
+
+
+Gyro/Accel
+----------
+
+Description       Offset    Type
+Pitch             9         signed char
+Pitch             9         signed char
+Roll              7         signed char
+Accel?            13        signed char
+Roll Accel?       17        signed char
+
+
+Trackpad
+--------
+
+Description       Offset    Type
