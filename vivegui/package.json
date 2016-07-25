@@ -1,0 +1,22 @@
+{
+  "name": "vivegui",
+  "version": "0.0.2",
+  "repo": "jb55/vivehid",
+  "description": "vivehid gui",
+  "keywords": [ "vive" ],
+  "global": true,
+  "install": "make && cp -f program ${PREFIX:-/usr/local}/bin/glisy-earth",
+  "dependencies": {
+    "glisy/camera": "0.0.4",
+    "glisy/color": "0.0.5",
+    "glisy/geometry": "0.0.2",
+    "glisy/gl": "0.0.1",
+    "glisy/glfw-shell": "0.0.5",
+    "glisy/math": "0.0.4",
+    "glisy/program": "0.0.4",
+    "glisy/shader": "0.0.1",
+    "glisy/uniform": "0.0.1",
+    "jwerle/fs.c": "0.1.2",
+    "jb55/tinyobjloader-c": "0.0.2"
+  }
+}
