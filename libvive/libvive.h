@@ -21,7 +21,7 @@ enum vive_controller_state {
 };
 
 enum vive_controller_options {
-  VIVE_CONTROLLER_SIXAXIS_SMOOTHING = 1 << 0
+  VIVE_CONTROLLER_SIXAXIS_SMOOTHING = 1 << 0,
 };
 
 enum vive_packet_type {

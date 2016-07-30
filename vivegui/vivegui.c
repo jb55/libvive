@@ -463,12 +463,6 @@ static void Draw(struct vive_controller *c,
   glPolygonMode(GL_FRONT, GL_FILL);
   glPolygonMode(GL_BACK, GL_FILL);
 
-  printf("readings %f %f %d %d\n",
-         c->pitch_smooth,
-         c->roll_smooth,
-         c->pitch,
-         c->roll);
-
   glPushMatrix();
   glRotatef((c->pitch_smooth / 15.0f) * 90.0f, 1.0f, 0, 0);
   glRotatef((c->roll_smooth / 15.0f) * -90.0f, 0, 0, 1.0f);

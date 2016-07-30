@@ -129,10 +129,11 @@ vive_init(struct vive_state *vive) {
 
 int vive_close(struct vive_state *vive) {
   int i = 0;
-  for (i = 0; vive->num_controllers; ++i) {
+  for (i = 0; i < vive->num_controllers; ++i) {
+    void *data;
     struct vive_controller *c = &vive->controllers[i];
     c->misc.state = VIVE_CONTROLLER_CLOSING;
-    pthread_join(c->misc.thread, NULL);
+    pthread_join(c->misc.thread, &data);
     c->misc.state = VIVE_CONTROLLER_CLOSED;
   }
 }
@@ -145,13 +146,13 @@ vive_open(struct vive_state *vive) {
   vive_init(vive);
 
   if ((err = vive_get_controllers(vive))) {
-    printf("returning early\n");
     return err;
   }
 
   for (i = 0; i < vive->num_controllers; ++i) {
     struct vive_controller *controller = &vive->controllers[i];
     controller->misc.state = VIVE_CONTROLLER_READING;
+
     if (pthread_create(&controller->misc.thread, NULL, read_controller,
                        controller)) {
       controller->misc.state = VIVE_CONTROLLER_CLOSED;
