@@ -14,7 +14,6 @@ enum packet_type {
   PACKET_TRACKPAD_TAP    = 243,
   PACKET_TRIGGER         = 244,
   PACKET_TRIGGER_BUTTON  = 245,
-
 };
 
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
@@ -100,7 +99,7 @@ int main(int argc, char* argv[])
 
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
-	handle = hid_open(0x28de, 0x2101, L"CFAFE97AC4");
+	handle = hid_open(0x28de, 0x2101, NULL);
 	/* handle = hid_open(0x0bb4, 0x2c87, NULL); // vive */
 
   if (!handle) {

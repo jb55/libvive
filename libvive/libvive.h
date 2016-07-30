@@ -14,8 +14,14 @@ enum vive_errors {
 };
 
 enum vive_controller_state {
+  VIVE_CONTROLLER_INIT,
   VIVE_CONTROLLER_READING,
   VIVE_CONTROLLER_CLOSING,
+  VIVE_CONTROLLER_CLOSED,
+};
+
+enum vive_controller_options {
+  VIVE_CONTROLLER_SIXAXIS_SMOOTHING = 1 << 0
 };
 
 enum vive_packet_type {
@@ -39,6 +45,7 @@ struct vive_ticks {
 struct vive_controller_misc {
   pthread_t thread;
   int state;
+  int options;
   unsigned char hid_buffer[255];
   hid_device *hid;
 };
@@ -50,6 +57,7 @@ struct vive_controller {
   unsigned char trigger;
   char trigger_click;
   char pitch, roll, pitch_accel, roll_accel;
+  float pitch_smooth, roll_smooth;
   char trackpad_x;
   char trackpad_y;
   char trackpad_edge_click;
@@ -66,4 +74,5 @@ struct vive_state {
 };
 
 int vive_open(struct vive_state *vive);
+int vive_close(struct vive_state *vive);
 int vive_get_controllers(struct vive_state *vive);

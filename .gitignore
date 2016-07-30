@@ -1,0 +1,7 @@
+*.a
+*.o
+*.mtl
+*.psd
+*.png
+*.tga
+vivegui/vivegui

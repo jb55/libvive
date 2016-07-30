@@ -43,7 +43,6 @@ Gyro/Accel
 
 Description       Offset    Type
 Pitch             9         signed char
-Pitch             9         signed char
 Roll              7         signed char
 Accel?            13        signed char
 Roll Accel?       17        signed char

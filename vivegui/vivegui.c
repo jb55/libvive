@@ -2,9 +2,12 @@
 #include "tinyobjloader/tinyobjloader.h"
 
 #include <GL/glew.h>
+#include <glisy/gl.h>
+#include <glisy/math.h>
 #include <float.h>
 #include <limits.h>
 #include <math.h>
+#include "libvive.h"
 
 #ifdef _WIN64
 #define atoll(S) _atoi64(S)
@@ -455,10 +458,20 @@ static void motionFunc(GLFWwindow* window, double mouse_x, double mouse_y) {
   prevMouseY = (float)mouse_y;
 }
 
-static void Draw(const DrawObject* draw_object) {
+static void Draw(struct vive_controller *c,
+                 const DrawObject* draw_object) {
   glPolygonMode(GL_FRONT, GL_FILL);
   glPolygonMode(GL_BACK, GL_FILL);
 
+  printf("readings %f %f %d %d\n",
+         c->pitch_smooth,
+         c->roll_smooth,
+         c->pitch,
+         c->roll);
+
+  glPushMatrix();
+  glRotatef((c->pitch_smooth / 15.0f) * 90.0f, 1.0f, 0, 0);
+  glRotatef((c->roll_smooth / 15.0f) * -90.0f, 0, 0, 1.0f);
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(1.0, 1.0);
   glColor3f(1.0f, 1.0f, 1.0f);
@@ -483,6 +496,7 @@ static void Draw(const DrawObject* draw_object) {
   glColor3f(0.0f, 0.0f, 0.4f);
 
   if (draw_object->vb >= 1) {
+
     glBindBuffer(GL_ARRAY_BUFFER, draw_object->vb);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -492,7 +506,9 @@ static void Draw(const DrawObject* draw_object) {
 
     glDrawArrays(GL_TRIANGLES, 0, 3 * draw_object->numTriangles);
     CheckErrors("drawarrays");
+
   }
+  glPopMatrix();
 }
 
 static void Init() {
@@ -511,8 +527,49 @@ static void Init() {
   up[2] = 0.0f;
 }
 
+static void draw_axis_lines () {
+  // save previous matrix
+  const double len = 2.0;
+  glPushMatrix();
+  // apply rotations
+  glRotatef(90.0, 1.0, 0.0, 0.0);
+  glRotatef(90.0, 0.0, 1.0, 0.0);
+  glRotatef(90.0, 0.0, 0.0, 1.0);
+  // move the axes to the screen corner
+  /* glTranslatef(-1.0, -1.0, 0.0); */
+  // draw our axes
+  glBegin(GL_LINES);
+  // draw line for x axis
+  glColor3f(1.0, 0.0, 0.0);
+  glVertex3f(-len, 0.0, 0.0);
+  glVertex3f(len, 0.0, 0.0);
+  // draw line for y axis
+  glColor3f(0.0, 1.0, 0.0);
+  glVertex3f(0.0, -len, 0.0);
+  glVertex3f(0.0, len, 0.0);
+  // draw line for Z axis
+  glColor3f(0.0, 0.0, 1.0);
+  glVertex3f(0.0, 0.0, -len);
+  glVertex3f(0.0, 0.0, len);
+  glEnd();
+  // load the previous matrix
+  glPopMatrix();
+}
+
+
 int main(int argc, char** argv) {
   Init();
+  struct vive_state vive;
+  struct vive_controller *controller;
+
+  if (vive_open(&vive)) {
+    printf("Could not read from vive controllers\n");
+    return 2;
+  }
+
+  printf("num controllers: %d\n", vive.num_controllers);
+
+  controller = &vive.controllers[0];
 
   printf("Initialize GLFW...\n");
 
@@ -571,6 +628,7 @@ int main(int argc, char** argv) {
       glEnable(GL_DEPTH_TEST);
 
       glMatrixMode(GL_MODELVIEW);
+
       glLoadIdentity();
       gluLookAt((GLdouble)eye[0], (GLdouble)eye[1], (GLdouble)eye[2],
                 (GLdouble)lookat[0], (GLdouble)lookat[1], (GLdouble)lookat[2],
@@ -585,11 +643,21 @@ int main(int argc, char** argv) {
       glTranslatef(-0.5f * (bmax[0] + bmin[0]), -0.5f * (bmax[1] + bmin[1]),
                    -0.5f * (bmax[2] + bmin[2]));
 
-      Draw(&gDrawObject);
+      glPushMatrix();
+      glTranslatef(-0.1f, 0, 0);
+      draw_axis_lines();
+      Draw(&vive.controllers[0], &gDrawObject);
+      glPopMatrix();
+      glPushMatrix();
+      glTranslatef(0.1f, 0, 0);
+      draw_axis_lines();
+      Draw(&vive.controllers[1], &gDrawObject);
+      glPopMatrix();
 
       glfwSwapBuffers(gWindow);
     }
   }
 
+  vive_close(&vive);
   glfwTerminate();
 }
