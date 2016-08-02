@@ -5,18 +5,18 @@
 
   libvive is a library for reading USB data from:
 
-    * VIVE controllers
-      - [x] Buttons
-      - [x] Gyros
-      - [ ] Lasers
+  * VIVE controllers
+    - [x] Buttons
+    - [x] Gyros
+    - [ ] Lasers
 
-    * VIVE headset
-      - [ ] Lasers
-      - [ ] Gyros?
-      - [ ] Camera
+  * VIVE headset
+    - [ ] Lasers
+    - [ ] Gyros?
+    - [ ] Camera
 
-    * Lighthouse
-      - [ ] ???
+  * Lighthouse
+    - [ ] ???
 
 ## Installation
 
