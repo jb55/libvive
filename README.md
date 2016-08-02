@@ -20,8 +20,9 @@
 
 ## Installation
 
-  Dependencies libvive: hidapi
-  Dependencies vivegui: glfw3, GLU, GLEW
+  Dependencies libvive: `hidapi`
+
+  Dependencies vivegui: `glfw3, GLU, GLEW`
 
     $ make install
 
