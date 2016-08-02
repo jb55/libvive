@@ -2,7 +2,6 @@
 #include "tinyobjloader/tinyobjloader.h"
 
 #include <GL/glew.h>
-#include <glisy/gl.h>
 #include <glisy/math.h>
 #include <float.h>
 #include <limits.h>

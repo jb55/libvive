@@ -1,0 +1,28 @@
+{
+  "name": "glisy",
+  "version": "0.0.4",
+  "repo": "glisy/math",
+  "description": "Math functions for Glisy",
+  "keywords": [
+    "glisy",
+    "math",
+    "matrix",
+    "vector"
+  ],
+  "src": [
+    "include/glisy/vector.h",
+    "include/glisy/matrix.h",
+    "include/glisy/euler.h",
+    "include/glisy/math.h",
+    "include/glisy/vec2.h",
+    "include/glisy/vec3.h",
+    "include/glisy/vec4.h",
+    "include/glisy/quat.h",
+    "include/glisy/mat2.h",
+    "include/glisy/mat3.h",
+    "include/glisy/mat4.h"
+  ],
+  "development": {
+    "jwerle/libok": "0.0.2"
+  }
+}

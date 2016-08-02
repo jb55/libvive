@@ -19,23 +19,28 @@ Type -> offset 4
 Packet Types
 ------------
 
-Description       Type2
+Description               Type2
 
-Gyro/Accel        232
-Analog            241
-Trackpad          242
-Trackpad Tap      243      # more reliable than Analog for some reason?
-Trigger           244
-Trigger Btn       245
+Gyro/Accel                232
+Analog                    241
+Trackpad                  242
+Trackpad Tap              243      # more reliable than Analog for some reason?
+Trigger                   244
+Trigger Btn               245
+Trigger + Other?          249
 
-Trigger + Other?  249
+Lasers Top Left           80-82
+Lasers Bottom             88
 
 
-Lasers Top (Counter-Clockwise)
-80,81,82
+Lasers
+------
 
-Lasers Bottom
-88
+Description             Offset
+
+Something important     7
+ 
+
 
 
 Gyro/Accel
@@ -44,7 +49,7 @@ Gyro/Accel
 Description       Offset    Type
 Pitch             9         signed char
 Roll              7         signed char
-Accel?            13        signed char
+Pitch Accel?      13        signed char
 Roll Accel?       17        signed char
 
 

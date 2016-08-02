@@ -1,12 +1,9 @@
 
 PREFIX=/usr/local
 
-CFLAGS += -g
-CFLAGS += -O0
+# CFLAGS += -g
+CFLAGS += -O2
 CFLAGS += -I deps
-
-vivehid: vivehid.c
-	$(CC) $(CFLAGS) $< -o $@ -lhidapi-hidraw
 
 OS ?= $(shell uname)
 
@@ -29,6 +26,9 @@ endif
 
 all: vivehid vivegui/vivegui libvive/libvive.so libvive/libvive_static.a
 
+vivehid: vivehid.c
+	$(CC) $(CFLAGS) $< -o $@ -lhidapi-hidraw
+
 vivegui/vivegui: $(VIVEGUI_SRC) libvive/libvive_static.a
 	$(CC) $(CFLAGS) $(VIVEGUI_CFLAGS) $^ -o $@
 
@@ -43,6 +43,12 @@ libvive/libvive_static.a: $(LIBVIVE_OBJS)
 
 libvive/libvive.o: $(LIBVIVE_SRC)
 	$(CC) $(CFLAGS) $(LIBVIVE_CFLAGS) -c -fPIC $^ -o $@
+
+install_libvive: $(LIBVIVE_LIBS)
+	install -D -t $(PREFIX)/lib $^
+
+install: install_libvive vivegui/vivegui
+	install -D -t $(PREFIX)/bin vivegui/vivegui
 
 clean:
 	rm -f vivegui/vivegui vivehid
