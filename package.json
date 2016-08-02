@@ -1,11 +1,10 @@
 {
-  "name": "vivegui",
+  "name": "libvive",
   "version": "0.0.2",
-  "repo": "jb55/vivehid",
-  "description": "vivehid gui",
+  "repo": "jb55/libvive",
+  "description": "libvive",
   "keywords": [ "vive" ],
   "global": true,
-  "install": "make && cp -f program ${PREFIX:-/usr/local}/bin/glisy-earth",
   "dependencies": {
     "glisy/math": "0.0.4",
     "jb55/tinyobjloader-c": "0.0.2"
