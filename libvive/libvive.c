@@ -35,6 +35,7 @@ read_controller (void *data) {
     if (!res) continue;
     unsigned char buttons = buf[5];
     unsigned short tick = get_tick(buf);
+    c->ticks.latest = tick;
 
     switch (buf[4]) {
     case VIVE_PACKET_TRIGGER:
@@ -88,6 +89,13 @@ read_controller (void *data) {
       c->pitch_accel = buf[13];
       break;
     }
+
+    if (buf[4] >= 0 && buf[4] <= VIVE_CONTROLLER_SENSORS * 8) {
+      char sensor = buf[4] / 8;
+      c->ticks.sensors[sensor] = tick;
+      c->sensors[sensor].a = buf[5];
+      c->sensors[sensor].b = buf[6];
+    }
   }
 
   c->misc.state = VIVE_CONTROLLER_CLOSED;
@@ -104,8 +112,12 @@ vive_init(struct vive_state *vive) {
     controller->ticks.analog = 0;
     controller->ticks.sixaxis = 0;
     controller->ticks.trackpad = 0;
+    controller->ticks.latest = 0;
     controller->ticks.trigger = 0;
     controller->ticks.trigger_click = 0;
+
+    memset(controller->ticks.sensors, 0, VIVE_CONTROLLER_SENSORS*8);
+    controller->ticks.sensors;
 
     controller->misc.hid = 0;
     controller->misc.state = VIVE_CONTROLLER_INIT;

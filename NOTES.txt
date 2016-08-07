@@ -19,29 +19,47 @@ Type -> offset 4
 Packet Types
 ------------
 
-Description               Type2
+Description                  Type
 
-Gyro/Accel                232
-Analog                    241
-Trackpad                  242
-Trackpad Tap              243      # more reliable than Analog for some reason?
-Trigger                   244
-Trigger Btn               245
-Trigger + Other?          249
+Gyro/Accel                   232
+Analog                       241
+Trackpad                     242
+Trackpad Tap                 243      # more reliable than Analog for some reason?
+Trigger                      244
+Trigger Btn                  245
+Trigger + Other?             249
 
-Lasers Top Left           80-82
-Lasers Bottom             88
+Unknown: 184 > x <= 200
+Unknown: 249 > x <= 255
+
+Still missing: battery reading
 
 
 Lasers
 ------
 
-Description             Offset
+24 Sensors
+Types: 0-184
 
-Something important     7
- 
+Each sensor id has 8 reserved bytes. It seems to only use the first 3.
+For example: Sensor 080 is actually sensors 80-82
 
+Top Left Clockwise    080 072 064 056
+    Middle            048
+    Right Counter     000 008 016 024
+    Inside L/R        040 032
 
+Bot Right Clockwise   088 096 104 112 120
+    Middle            136 
+    Left Counter      184 176 168 160 152
+    Inside R/L        128 144
+
+Controller Measurements
+-----------------------
+
+000-008: 25mm
+008-016: 30mm
+000-016: 40mm
 
 Gyro/Accel
 ----------

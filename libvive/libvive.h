@@ -5,6 +5,7 @@
 #define VIVE_REPORT 1
 #define VIVE_CONTROLLER_VID 0x28de
 #define VIVE_CONTROLLER_PID 0x2101
+#define VIVE_CONTROLLER_SENSORS 24
 #define VIVE_MAX_CONTROLLERS 8
 
 enum vive_errors {
@@ -33,13 +34,15 @@ enum vive_packet_type {
   VIVE_PACKET_TRIGGER_CLICK = 245,
 };
 
-struct vive_ticks {
+struct vive_controller_ticks {
+  unsigned short latest;
   unsigned short analog;
   unsigned short sixaxis;
   unsigned short trackpad;
   unsigned short trackpad_tap;
   unsigned short trigger;
   unsigned short trigger_click;
+  unsigned short sensors[VIVE_CONTROLLER_SENSORS];
 };
 
 struct vive_controller_misc {
@@ -50,9 +53,13 @@ struct vive_controller_misc {
   hid_device *hid;
 };
 
+struct vive_sensor {
+  unsigned char a, b;
+};
+
 struct vive_controller {
   struct vive_controller_misc misc;
-  struct vive_ticks ticks;
+  struct vive_controller_ticks ticks;
 
   unsigned char trigger;
   char trigger_click;
@@ -65,6 +72,8 @@ struct vive_controller {
   char trackpad_tap;
   char hamburger;
   char side_button;
+
+  struct vive_sensor sensors[VIVE_CONTROLLER_SENSORS*8];
 };
 
 struct vive_state {

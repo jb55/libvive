@@ -27,6 +27,13 @@ enum packet_type {
     (byte & 0x02 ? '1' : '0'),                  \
     (byte & 0x01 ? '1' : '0')
 
+
+static inline unsigned short
+get_tick(const unsigned char* buf) {
+  return ((buf[1] << 8) & 0xFF00)
+       | ((buf[3])      & 0xFF);
+}
+
 void print_binary(u8 byte) {
   fprintf(stderr, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(byte));
 }
@@ -182,11 +189,13 @@ int main(int argc, char* argv[])
       /* print_sixaxis(buf, res); */
       break;
     }
-    for (i = 0; i < res; i++)
+    for (i = 0; i < res; i++) {
+      printf("%03hhu ", buf[i]);
+    }
+    printf("%hu", get_tick(buf));
+    printf("\n", get_tick(buf));
       /* printf("%02hhx ", buf[i]); */
-      printf("%02d:%03hhu ", i, buf[i]);
       /* printf("%03hhu ", buf[i]); */
-    printf("\n");
   }
 
 	return 0;

@@ -31,6 +31,7 @@
 #include "trackball.h"
 #include "colorspace.h"
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 typedef struct {
   GLuint vb;
@@ -457,6 +458,48 @@ static void motionFunc(GLFWwindow* window, double mouse_x, double mouse_y) {
   prevMouseY = (float)mouse_y;
 }
 
+static float sensor_dots[][3] = {
+  {  0.03545f, -0.00801f, -0.00152f }, // Top Right Counter-clockwise
+  {  0.03759f, -0.02146f, -0.01999f },
+  {  0.05385f, -0.03781f, -0.00747f },
+  {  0.02778f, -0.06243f, -0.03579f },
+  {  0.02835f, -0.02966f, -0.02643f }, // Top Inside Right
+  { -0.02757f, -0.02985f, -0.02687f }, // Top Inside Left
+  {  0.0f,     -0.06104f, -0.04377f }, // Top Middle
+  { -0.02762f, -0.06226f, -0.03471f }, // Top Left Counter-clockwise
+  { -0.05369f, -0.03879f, -0.00726f },
+  { -0.03747f, -0.02111f, -0.02072f },
+  { -0.03554f, -0.00841f, -0.00079f },
+  {  0.03188f, -0.01453f,  0.00656f }, // Bottom Right Clockwise
+  {  0.04558f, -0.02701f,  0.00724f },
+  {  0.05266f, -0.04685f,  0.00197f },
+  {  0.04585f, -0.05162f, -0.00977f },
+  {  0.03136f, -0.06034f, -0.02476f },
+  { -0.00022f, -0.01974f,  0.01542f }, // Bottom Middle
+  { -0.00868f, -0.05235f, -0.01677f }, // Bottom Inside Right
+  {  0.00868f, -0.05235f, -0.01677f }, // Bottom Inside Left
+  { -0.03166f, -0.06059f, -0.02476f }, // Bottom Left Clockwise
+  { -0.04557f, -0.05019f, -0.00977f },
+  { -0.05176f, -0.04662f,  0.00197f },
+  { -0.04543f, -0.02895f,  0.00724f },
+  { -0.03142f, -0.01482f,  0.00656f },
+};
+
+static void
+draw_sensor_dots (struct vive_controller *controller) {
+  int i, age = 0;
+  glPointSize(10);
+  glBegin(GL_POINTS);
+  for (i = 0; i < ARRAY_SIZE(sensor_dots); ++i) {
+    age = abs(controller->ticks.latest - controller->ticks.sensors[i]);
+    age = 1.0f - (sqrt(age) / 255.0f);
+    glColor3f(age, 0.0f, 0.0f);
+    glVertex3f(sensor_dots[i][0], sensor_dots[i][1], sensor_dots[i][2]);
+  }
+  glEnd();
+}
+
+
 static void Draw(struct vive_controller *c,
                  const DrawObject* draw_object) {
   glPolygonMode(GL_FRONT, GL_FILL);
@@ -501,6 +544,7 @@ static void Draw(struct vive_controller *c,
     CheckErrors("drawarrays");
 
   }
+  draw_sensor_dots(c);
   glPopMatrix();
 }
 
@@ -520,7 +564,8 @@ static void Init() {
   up[2] = 0.0f;
 }
 
-static void draw_axis_lines () {
+static void
+draw_axis_lines () {
   // save previous matrix
   const double len = 2.0;
   glPushMatrix();
