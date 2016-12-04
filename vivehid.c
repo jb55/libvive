@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <stdint.h>
 
 #include <hidapi/hidapi.h>
 
@@ -70,7 +72,8 @@ int main(int argc, char* argv[])
 {
 	int res;
 	u8 report;
-	unsigned char buf[128] = {0};
+	unsigned char buf[64] = {0};
+  void *config_z = malloc(4096);
 	#define MAX_STR 255
 	wchar_t wstr[MAX_STR];
 	hid_device *handle;
@@ -80,7 +83,7 @@ int main(int argc, char* argv[])
   if (argc > 1)
     sscanf(argv[1], "%hhu", &report);
   else
-    report = 1;
+    report = 0x10;
 
 	// Enumerate and print the HID devices on the system
 	struct hid_device_info *devs, *cur_dev;
@@ -106,8 +109,8 @@ int main(int argc, char* argv[])
 
 	// Open the device using the VID, PID,
 	// and optionally the Serial number.
-	handle = hid_open(0x28de, 0x2101, NULL);
-	/* handle = hid_open(0x0bb4, 0x2c87, NULL); // vive */
+	/* handle = hid_open(0x28de, 0x2101, L"CFAFE97AC4"); */
+	handle = hid_open(0x28de, 0x2000, NULL); // vive
 
   if (!handle) {
     fprintf(stderr, "Couldn't get hid handle %04hx %04hx\n",
@@ -128,75 +131,99 @@ int main(int argc, char* argv[])
 	fprintf(stderr, "Serial Number String: %ls", wstr);
 	fprintf(stderr, "\n");
 
-	// Send a Feature Report to the device
-	buf[0] = report; // First byte is report number
-	buf[1] = 0xff;
-  buf[2] = 0xff;
-  buf[3] = 0xff;
-  res = hid_send_feature_report(handle, buf, 17);
-
 	// Read a Feature Report from the device
-  buf[0] = report;
-  res = hid_get_feature_report(handle, buf, 64);
+  buf[0] = 0x10;
+  res = hid_get_feature_report(handle, buf, sizeof(buf));
   fprintf(stderr, "Feature Report %hhu (%d)\n", report, res);
 
+  int ret, count = 0;
+  buf[0] = 0x11;
+  do {
+      ret = hid_get_feature_report(handle, buf, sizeof(buf));
+      if (ret < 0) {
+          printf("Read error after %d bytes\n", count);
+          free(config_z);
+          return 1;
+      }
+
+      if (buf[1] > 62) {
+          printf("Invalid configuration data at %d, got %d\n", count, buf[1]);
+          free(config_z);
+          return 1;
+      }
+
+      if (count + buf[1] > 4096) {
+          printf("Configuration data too large\n");
+          free(config_z);
+          return 1;
+      }
+
+      memcpy((uint8_t*)config_z + count, buf + 2, buf[1]);
+      count += buf[1];
+  } while (buf[1]);
+
+  FILE *conf = fopen ("vive-config.bin", "wb");
+  fwrite(config_z, count, 1, conf);
+  fclose(conf);
+  free(config_z);
+
   // Print out the returned buffer.
-  for (i = 0; i < res; i++)
-    fprintf(stderr, "%02hhx ", buf[i]);
-  fprintf(stderr, "\n");
+  /* for (i = 0; i < res; i++) */
+  /*   fprintf(stderr, "%02hhx ", buf[i]); */
+  /* fprintf(stderr, "\n"); */
 
+  /* /\* buf[1] = 0x81; *\/ */
+	/* /\* hid_write(handle, buf, 1); *\/ */
+
+	/* hid_set_nonblocking(handle, 0); */
+	/* // Send an Output report to toggle the LED (cmd 0x80) */
+	/* /\* buf[0] = 1; // First byte is report number *\/ */
+	/* /\* buf[1] = 0x80; *\/ */
+	/* /\* res = hid_write(handle, buf, 65); *\/ */
+
+	/* // Send an Output report to request the state (cmd 0x81) */
+  /* buf[0] = report; */
   /* buf[1] = 0x81; */
-	/* hid_write(handle, buf, 1); */
+  /* hid_write(handle, buf, 1); */
 
-	hid_set_nonblocking(handle, 0);
-	// Send an Output report to toggle the LED (cmd 0x80)
-	/* buf[0] = 1; // First byte is report number */
-	/* buf[1] = 0x80; */
-	/* res = hid_write(handle, buf, 65); */
+	/* // Read requested state */
+  /* /\* if (res < 0 || res < 78) *\/ */
 
-	// Send an Output report to request the state (cmd 0x81)
-  buf[0] = report;
-  buf[1] = 0x81;
-  hid_write(handle, buf, 1);
-
-	// Read requested state
-  /* if (res < 0 || res < 78) */
-
-  while (1) {
-    res = hid_read(handle, buf, 128);
-    if (!res) continue;
-    u8 buttons = buf[5];
-    switch (buf[4]) {
-    case PACKET_TRIGGER:
-      if (buttons >= 5)
-        fprintf(stderr, "trigger %hhu\n", buttons);
-      break;
-    case PACKET_TRIGGER_BUTTON:
-      if (buttons == 1)
-        fprintf(stderr, "trigger_click\n");
-      break;
-    case PACKET_ANALOG:
-      print_buttons(buf);
-      break;
-    case PACKET_TRACKPAD:
-      print_trackpad(buf, res);
-      break;
-    case PACKET_TRACKPAD_TAP:
-      if (buttons == 2)
-        fprintf(stderr, "trackpad_tap\n");
-      break;
-    case PACKET_SIXAXIS:
-      /* print_sixaxis(buf, res); */
-      break;
-    }
-    for (i = 0; i < res; i++) {
-      printf("%03hhu ", buf[i]);
-    }
-    printf("%hu", get_tick(buf));
-    printf("\n", get_tick(buf));
-      /* printf("%02hhx ", buf[i]); */
-      /* printf("%03hhu ", buf[i]); */
-  }
+  /* while (1) { */
+  /*   res = hid_read(handle, buf, 128); */
+  /*   if (!res) continue; */
+  /*   u8 buttons = buf[5]; */
+  /*   switch (buf[4]) { */
+  /*   case PACKET_TRIGGER: */
+  /*     if (buttons >= 5) */
+  /*       fprintf(stderr, "trigger %hhu\n", buttons); */
+  /*     break; */
+  /*   case PACKET_TRIGGER_BUTTON: */
+  /*     if (buttons == 1) */
+  /*       fprintf(stderr, "trigger_click\n"); */
+  /*     break; */
+  /*   case PACKET_ANALOG: */
+  /*     print_buttons(buf); */
+  /*     break; */
+  /*   case PACKET_TRACKPAD: */
+  /*     print_trackpad(buf, res); */
+  /*     break; */
+  /*   case PACKET_TRACKPAD_TAP: */
+  /*     if (buttons == 2) */
+  /*       fprintf(stderr, "trackpad_tap\n"); */
+  /*     break; */
+  /*   case PACKET_SIXAXIS: */
+  /*     /\* print_sixaxis(buf, res); *\/ */
+  /*     break; */
+  /*   } */
+  /*   for (i = 0; i < res; i++) { */
+  /*     printf("%03hhu ", buf[i]); */
+  /*   } */
+  /*   printf("%hu", get_tick(buf)); */
+  /*   printf("\n", get_tick(buf)); */
+  /*     /\* printf("%02hhx ", buf[i]); *\/ */
+  /*     /\* printf("%03hhu ", buf[i]); *\/ */
+  /* } */
 
 	return 0;
 }
