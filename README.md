@@ -1,6 +1,8 @@
 
 # libvive
 
+You probably want [libsurvive](https://github.com/cntools/libsurvive)
+
 [![vivegui](https://jb55.com/s/9f77565aabe6ef04.gif "ViveGUI")](https://jb55.com/s/vivegui_smoothing.mp4)
 
   libvive is a library for reading USB data from:
